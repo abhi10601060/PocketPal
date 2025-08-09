@@ -1,9 +1,16 @@
 package com.app.pocketpal.constant
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import androidx.compose.ui.graphics.Color
 import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.presentation.ui.theme.GreenSurface
 import com.app.pocketpal.presentation.ui.theme.YellowSurface
+import java.io.IOException
 
 val MAIN_SCREEN_TABS = listOf("Dashboard", "History")
 
@@ -33,4 +40,29 @@ fun createPastelColor(color: Color, lightness: Float = 0.8f): Color {
         blue = color.blue + (1f - color.blue) * lightness,
         alpha = 1f
     )
+}
+
+
+fun uriToBitmap(context: Context, uri: Uri): Bitmap? {
+    return try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // For Android P (API 28) and above
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            ImageDecoder.decodeBitmap(source)
+        } else {
+            // For older Android versions
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)
+            }
+        }
+    } catch (e: IOException) {
+        e.printStackTrace()
+        null
+    } catch (e: SecurityException) {
+        e.printStackTrace()
+        null
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 }

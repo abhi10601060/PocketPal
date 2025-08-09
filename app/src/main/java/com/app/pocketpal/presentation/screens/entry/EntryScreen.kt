@@ -1,7 +1,13 @@
 package com.app.pocketpal.presentation.screens.entry
 
+import android.Manifest
 import android.R
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,17 +18,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.UploadFile
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,6 +53,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,10 +62,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import co.yml.charts.common.extensions.isNotNull
 import com.app.pocketpal.constant.LABEL_LIST
+import com.app.pocketpal.constant.uriToBitmap
 import com.app.pocketpal.di.DiTest
 import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.presentation.common.AmountTextField
@@ -82,7 +107,8 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
             .background(color = MaterialTheme.colorScheme.background)
             .padding(start = 10.dp, end = 10.dp)
         ){
-            Row(modifier = modifier.fillMaxWidth()
+            Row(modifier = modifier
+                .fillMaxWidth()
                 .padding(top = 8.dp, start = 0.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -94,12 +120,16 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(text = "Title", fontSize = 19.sp, fontWeight = FontWeight.Bold)
-            PocketPalTextField( modifier.padding(top = 5.dp).fillMaxWidth(), value = viewModel.title, singleLine = true, onValueChange = {viewModel.title = it.trim()})
+            PocketPalTextField( modifier
+                .padding(top = 5.dp)
+                .fillMaxWidth(), value = viewModel.title, singleLine = true, onValueChange = {viewModel.title = it.trim()})
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(text = "Description", fontSize = 19.sp, fontWeight = FontWeight.Bold)
-            PocketPalTextField( modifier.padding(top = 5.dp).fillMaxWidth(), value = viewModel.description, onValueChange = {viewModel.description = it}, singleLine = false, minLines = 5)
+            PocketPalTextField( modifier
+                .padding(top = 5.dp)
+                .fillMaxWidth(), value = viewModel.description, onValueChange = {viewModel.description = it}, singleLine = false, minLines = 5)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -124,6 +154,21 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
                 }
             }
 
+            Spacer(modifier = Modifier.height(15.dp))
+
+            ImageCaptureOptions(){ bitmap ->
+                viewModel.images.add(bitmap)
+            }
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                itemsIndexed (viewModel.images.toList()) { _, bm ->
+                    ImageCardWithCancel(bitmap = bm, onRemove = {viewModel.images.remove(bm)})
+                }
+
+            }
+
         }
 
         Box(modifier = Modifier.fillMaxSize()){
@@ -144,7 +189,9 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
 fun EntryScreenOptions(modifier: Modifier = Modifier, onCancelClicked: () -> Unit = {}, onEditClicked: () -> Unit = {}){
     Row(modifier = modifier,
     ) {
-        Icon(modifier = modifier.alpha(0.8f).clickable{onCancelClicked()}, imageVector = Icons.Default.Cancel, contentDescription = "close", tint = Color.Red)
+        Icon(modifier = modifier
+            .alpha(0.8f)
+            .clickable { onCancelClicked() }, imageVector = Icons.Default.Cancel, contentDescription = "close", tint = Color.Red)
     }
 }
 
@@ -154,7 +201,9 @@ fun ErrorDialog(
     onDismiss: () -> Unit
 ){
     AlertDialog(
-        modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(color = LightAccent),
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(color = LightAccent),
         onDismissRequest = onDismiss,
         title = {
             Box(
@@ -184,12 +233,106 @@ fun ErrorDialog(
 
 }
 
+@Composable
+fun ImageCaptureOptions(modifier: Modifier = Modifier, onImageAdded : (Bitmap) -> Unit ) {
+    val context = LocalContext.current
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.let {
+            onImageAdded(it)
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        val bitmap = uriToBitmap(context, uri!!)
+        if (bitmap.isNotNull()) {
+            onImageAdded(bitmap!!)
+        } else {
+            Toast.makeText(context, "Unable to upload...", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            cameraLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Camera permission required", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "Add Receipt", fontSize = 19.sp, fontWeight = FontWeight.Bold)
+
+        Row {
+            Icon(modifier = Modifier.clickable{
+                val permission = Manifest.permission.CAMERA
+                if (ContextCompat.checkSelfPermission(context, permission)
+                    == PackageManager.PERMISSION_GRANTED) {
+                    cameraLauncher.launch(null)
+                } else {
+                    cameraPermissionLauncher.launch(permission)
+                }
+                },
+                imageVector = Icons.Default.PhotoCamera,
+                contentDescription = "camera"
+            )
+
+            Spacer(modifier = Modifier.width(20.dp))
+
+            Icon(modifier = Modifier.clickable{
+                galleryLauncher.launch("image/*")
+                },
+                imageVector = Icons.Default.Upload,
+                contentDescription = "upload"
+            )
+        }
+    }
+}
+
+@Composable
+fun ImageCardWithCancel(
+    bitmap: Bitmap,
+    onRemove: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface ( modifier = modifier.padding(10.dp), shadowElevation = 10.dp ) {
+        Box(
+            modifier = Modifier.padding(horizontal = 5.dp).size(width = 150.dp, 220.dp),
+        ) {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = "Selected Image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            Icon(
+                modifier = Modifier.size(30.dp).offset(y = 0.dp).align(Alignment.BottomCenter).clickable{onRemove()},
+                imageVector = Icons.Outlined.Cancel,
+                contentDescription = "Remove Image",
+                tint = MaterialTheme.colorScheme.error,
+            )
+        }
+    }
+}
+
 
 @Preview
 @Composable
 private fun EntryScreenPrev() {
     PocketPalTheme {
-//        EntryScreen(onCancelClicked = {})
-        ErrorDialog("dada") { }
+        EntryScreen(onCancelClicked = {})
+//        ErrorDialog("dada") { }
     }
 }

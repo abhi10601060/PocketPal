@@ -3,10 +3,12 @@ package com.app.pocketpal.presentation.screens.entry
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil3.Bitmap
 import com.app.pocketpal.data.room.model.Expense
 import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.domain.use_case.get_all_expense.GetAllExpenseUseCase
@@ -24,6 +26,8 @@ class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertU
     var description by mutableStateOf("")
     var amount by mutableStateOf(0)
     var selectedLabel by mutableStateOf<Label?>(null)
+    var images = mutableStateListOf<Bitmap>()
+
     var entryScreenState by mutableStateOf(EntryScreenState())
 
 
