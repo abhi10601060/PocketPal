@@ -3,6 +3,13 @@ package com.app.pocketpal.presentation.screens.history
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
+import com.app.pocketpal.presentation.ui.theme.ThemeColor
 
 @Composable
 fun HistoryScreen(
@@ -25,7 +33,7 @@ fun HistoryScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -35,6 +43,26 @@ fun HistoryScreen(
             color = contentColor,
             textAlign = TextAlign.Center
         )
+
+        FloatingActionButton(
+            onClick = {},
+            modifier = modifier.align(Alignment.BottomEnd).padding(end = 30.dp, bottom = 30.dp),
+            containerColor = ThemeColor,
+            contentColor = Color.White,
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 12.dp,
+                pressedElevation = 16.dp,
+                focusedElevation = 14.dp,
+                hoveredElevation = 14.dp
+            ),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Transaction",
+                modifier = Modifier.size(28.dp)
+            )
+        }
     }
 }
 
@@ -42,6 +70,6 @@ fun HistoryScreen(
 @Composable
 private fun HistoryScreenPrev() {
     PocketPalTheme {
-        HistoryScreen(isDarkTheme = true)
+        HistoryScreen(isDarkTheme = false)
     }
 }
