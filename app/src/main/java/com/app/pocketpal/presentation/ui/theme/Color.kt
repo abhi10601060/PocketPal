@@ -22,4 +22,6 @@ val LightBackground = Color(0xFFFFFFFF)      // Pure White
 val LightSurface = Color(0xFFF8FAFF)         // Soft Blue White
 val LightAccent = Color(0xFFF0F4FF)
 
-val TextBoxSurface = Color(0x5375f61A)
+val GreenSurface = Color(0xFF0C9229)
+val YellowSurface = Color(0xFFFFA000)
+val SkyBlueSurface = Color(0xFF03A9F4)

@@ -1,6 +1,7 @@
 package com.app.pocketpal.presentation.screens.entry
 
 import android.R
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,6 +64,11 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
         ),
     ){
 
+        if (viewModel.entryScreenState.success){
+            Toast.makeText(LocalContext.current, "Expense entry created successfully...", Toast.LENGTH_SHORT).show()
+            onCancelClicked()
+        }
+
         if (viewModel.entryScreenState.error.isNotEmpty()){
             ErrorDialog(viewModel.entryScreenState.error) {
                 viewModel.entryScreenState = EntryScreenState()
@@ -71,12 +78,12 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
         Column (modifier
             .padding(horizontal = 20.dp, vertical = 30.dp)
             .fillMaxSize()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(15.dp))
             .background(color = MaterialTheme.colorScheme.background)
             .padding(start = 10.dp, end = 10.dp)
         ){
             Row(modifier = modifier.fillMaxWidth()
-                .padding(top = 8.dp, start = 5.dp),
+                .padding(top = 8.dp, start = 0.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){

@@ -22,17 +22,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.pocketpal.constant.createPastelColor
 import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.presentation.ui.theme.LightAccent
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
+import com.app.pocketpal.presentation.ui.theme.SkyBlueSurface
 import com.app.pocketpal.presentation.ui.theme.ThemeColor
 
 
 @Composable
 fun LabelDropdown(modifier: Modifier = Modifier, labels: List<Label>, fontSize : TextUnit = 15.sp, value: Label? = null, onLabelSelected : (label : Label) -> Unit) {
 
-    var color = if(value == null) Color.Cyan else value.color
-    var bgColor = color.copy(alpha = 0.2f)
+    var color = if(value == null) SkyBlueSurface else value.color
+    var bgColor = createPastelColor(color)
 
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -65,10 +67,6 @@ fun LabelDropdown(modifier: Modifier = Modifier, labels: List<Label>, fontSize :
             }
         }
     }
-
-
-
-
 }
 
 

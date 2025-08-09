@@ -32,16 +32,13 @@ class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertU
         if (validation.isEmpty()){
             val expense = Expense("PP:" + System.currentTimeMillis(), title, description, amount, selectedLabel!!.name)
             viewModelScope.launch(Dispatchers.IO) {
-//                upsertExpenseUseCase.invoke(expense).collect {
-//                    if (it){
-//                        Log.d("EXPENSE", "saveData: success")
-//                    }
-//                    else{
-//                        Log.d("EXPENSE", "saveData: success")
-//                    }
-//                }
-                getAllExpenseUseCase.invoke().collect{
-                    Log.d("EXPENSE", "saveData: $it")
+                upsertExpenseUseCase.invoke(expense).collect {
+                    if (it){
+                        entryScreenState = EntryScreenState(success = true)
+                    }
+                    else{
+                        entryScreenState = EntryScreenState(error = "Something went wrong")
+                    }
                 }
             }
         }
