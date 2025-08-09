@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.pocketpal.data.room.model.Expense
 import com.app.pocketpal.domain.model.Label
+import com.app.pocketpal.domain.use_case.get_all_expense.GetAllExpenseUseCase
 import com.app.pocketpal.domain.use_case.upsert_expense.UpsertUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 
 
 @HiltViewModel
-class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertUseCase) : ViewModel() {
+class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertUseCase, val getAllExpenseUseCase: GetAllExpenseUseCase) : ViewModel() {
 
     var title by mutableStateOf("")
     var description by mutableStateOf("")
@@ -31,13 +32,16 @@ class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertU
         if (validation.isEmpty()){
             val expense = Expense("PP:" + System.currentTimeMillis(), title, description, amount, selectedLabel!!.name)
             viewModelScope.launch(Dispatchers.IO) {
-                upsertExpenseUseCase.invoke(expense).collect {
-                    if (it){
-                        Log.d("EXPENSE", "saveData: success")
-                    }
-                    else{
-                        Log.d("EXPENSE", "saveData: success")
-                    }
+//                upsertExpenseUseCase.invoke(expense).collect {
+//                    if (it){
+//                        Log.d("EXPENSE", "saveData: success")
+//                    }
+//                    else{
+//                        Log.d("EXPENSE", "saveData: success")
+//                    }
+//                }
+                getAllExpenseUseCase.invoke().collect{
+                    Log.d("EXPENSE", "saveData: $it")
                 }
             }
         }

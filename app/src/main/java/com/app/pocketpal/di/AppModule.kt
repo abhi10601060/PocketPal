@@ -2,9 +2,11 @@ package com.app.pocketpal.di
 
 import android.content.Context
 import androidx.room.Room
+import com.app.pocketpal.data.repo.ExpenseRepoImpl
 import com.app.pocketpal.data.room.dao.ExpenseDao
 
 import com.app.pocketpal.data.room.db.ExpenseDB
+import com.app.pocketpal.domain.repo.ExpenseRepo
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,6 +32,11 @@ object AppModule {
     @Provides
     fun provideUserDao(database: ExpenseDB): ExpenseDao {
         return database.expenseDao()
+    }
+
+    @Provides
+    fun provideExpenseRepo(expenseDao: ExpenseDao) : ExpenseRepo{
+        return ExpenseRepoImpl(expenseDao)
     }
 }
 
