@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.pocketpal.presentation.screens.entry.EntryScreen
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
 import com.app.pocketpal.presentation.ui.theme.ThemeColor
@@ -74,6 +75,7 @@ fun HistoryScreen(
         }
 
         if (showEntryDialog){
+
             EntryScreen(onCancelClicked = {showEntryDialog = false})
         }
     }

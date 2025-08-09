@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -26,20 +27,20 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.size.Size
 import com.app.pocketpal.presentation.ui.theme.LightAccent
-import com.app.pocketpal.presentation.ui.theme.LightSurface
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
 import com.app.pocketpal.presentation.ui.theme.ThemeColor
 
 @Composable
 fun AmountTextField(modifier: Modifier = Modifier,fontSize: TextUnit = 18.sp, value: String, onValueChange: (String) -> Unit = {}, readOnly: Boolean = false) {
     TextField(value =  value,
-        onValueChange = {},
+        onValueChange = {onValueChange(it)},
         placeholder = {Text(text = "0", fontSize = fontSize, fontWeight = FontWeight.Bold, color = Color.Gray)},
         modifier = modifier
                 .widthIn(min = 100.dp , max = 160.dp)
@@ -56,7 +57,8 @@ fun AmountTextField(modifier: Modifier = Modifier,fontSize: TextUnit = 18.sp, va
         singleLine = true,
         trailingIcon = {Text(text = "₹", fontSize = (fontSize.value + 4f).sp, fontWeight = FontWeight.Bold)},
         textStyle = TextStyle(fontSize = fontSize, fontWeight = FontWeight.Bold),
-        readOnly = readOnly
+        readOnly = readOnly,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     )
 }
 

@@ -1,5 +1,6 @@
 package com.app.pocketpal.presentation.screens.entry
 
+import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,13 +12,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
@@ -32,17 +38,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.app.pocketpal.constant.LABEL_LIST
+import com.app.pocketpal.di.DiTest
 import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.presentation.common.AmountTextField
 import com.app.pocketpal.presentation.common.LabelDropdown
 import com.app.pocketpal.presentation.common.PocketPalTextField
+import com.app.pocketpal.presentation.ui.theme.LightAccent
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
 
 @Composable
-fun EntryScreen(modifier: Modifier = Modifier, onCancelClicked: () -> Unit) {
-
-    var selectedLabel by remember { mutableStateOf<Label?>(null) }
+fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= hiltViewModel(key = "" + System.currentTimeMillis()), onCancelClicked: () -> Unit) {
 
     Dialog(
         onDismissRequest = { /* Handle dismiss request */ },
@@ -52,6 +61,13 @@ fun EntryScreen(modifier: Modifier = Modifier, onCancelClicked: () -> Unit) {
             usePlatformDefaultWidth = false
         ),
     ){
+
+        if (viewModel.entryScreenState.error.isNotEmpty()){
+            ErrorDialog(viewModel.entryScreenState.error) {
+                viewModel.entryScreenState = EntryScreenState()
+            }
+        }
+
         Column (modifier
             .padding(horizontal = 20.dp, vertical = 30.dp)
             .fillMaxSize()
@@ -71,12 +87,12 @@ fun EntryScreen(modifier: Modifier = Modifier, onCancelClicked: () -> Unit) {
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(text = "Title", fontSize = 19.sp, fontWeight = FontWeight.Bold)
-            PocketPalTextField( modifier.padding(top = 5.dp).fillMaxWidth(), value = "asadad", singleLine = true)
+            PocketPalTextField( modifier.padding(top = 5.dp).fillMaxWidth(), value = viewModel.title, singleLine = true, onValueChange = {viewModel.title = it.trim()})
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(text = "Description", fontSize = 19.sp, fontWeight = FontWeight.Bold)
-            PocketPalTextField( modifier.padding(top = 5.dp).fillMaxWidth(), value = "asadad", singleLine = false, minLines = 5)
+            PocketPalTextField( modifier.padding(top = 5.dp).fillMaxWidth(), value = viewModel.description, onValueChange = {viewModel.description = it}, singleLine = false, minLines = 5)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -89,7 +105,7 @@ fun EntryScreen(modifier: Modifier = Modifier, onCancelClicked: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(text = "Add Label", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    LabelDropdown(modifier = Modifier.padding(top = 5.dp), labels = LABEL_LIST, value = selectedLabel) { label->  selectedLabel = label}
+                    LabelDropdown(modifier = Modifier.padding(top = 5.dp), labels = LABEL_LIST, value = viewModel.selectedLabel) { label->  viewModel.selectedLabel = label}
                 }
 
                 Column(
@@ -97,7 +113,7 @@ fun EntryScreen(modifier: Modifier = Modifier, onCancelClicked: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(text = "Enter Amount", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    AmountTextField(value = "1000000", fontSize = 18.sp)
+                    AmountTextField(value = viewModel.amount.toString(), onValueChange = {viewModel.amount = if (it.isEmpty()) 0 else it.trim().toInt()}, fontSize = 18.sp)
                 }
             }
 
@@ -108,7 +124,7 @@ fun EntryScreen(modifier: Modifier = Modifier, onCancelClicked: () -> Unit) {
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 40.dp),
-                onClick = {}
+                onClick = { viewModel.saveData() }
             ) {
                 Text(text = "Save")
             }
@@ -125,11 +141,48 @@ fun EntryScreenOptions(modifier: Modifier = Modifier, onCancelClicked: () -> Uni
     }
 }
 
+@Composable
+fun ErrorDialog(
+    message: String,
+    onDismiss: () -> Unit
+){
+    AlertDialog(
+        modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(color = LightAccent),
+        onDismissRequest = onDismiss,
+        title = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = "Input Required",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+        },
+        text = {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text("OK")
+            }
+        }
+    )
+
+}
+
 
 @Preview
 @Composable
 private fun EntryScreenPrev() {
     PocketPalTheme {
-        EntryScreen(onCancelClicked = {})
+//        EntryScreen(onCancelClicked = {})
+        ErrorDialog("dada") { }
     }
 }
