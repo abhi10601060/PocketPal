@@ -16,3 +16,10 @@ val ThemeColor = Color(0xFF5375f6)
 val CharCoal = Color(0xFF1A1A1A)
 val DarkSurface = Color(0xFF2D2D2D)
 val DarkAccent = Color(0xFF404040)
+
+
+val LightBackground = Color(0xFFFFFFFF)      // Pure White
+val LightSurface = Color(0xFFF8FAFF)         // Soft Blue White
+val LightAccent = Color(0xFFF0F4FF)
+
+val TextBoxSurface = Color(0x5375f61A)
