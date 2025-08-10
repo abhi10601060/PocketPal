@@ -31,7 +31,13 @@ import com.app.pocketpal.presentation.ui.theme.ThemeColor
 
 
 @Composable
-fun LabelDropdown(modifier: Modifier = Modifier, labels: List<Label>, fontSize : TextUnit = 15.sp, value: Label? = null, onLabelSelected : (label : Label) -> Unit) {
+fun LabelDropdown(modifier: Modifier = Modifier,
+                  labels: List<Label>,
+                  fontSize : TextUnit = 15.sp,
+                  value: Label? = null,
+                  readOnly : Boolean = false,
+                  onLabelSelected : (label : Label) -> Unit
+) {
 
     var color = if(value == null) SkyBlueSurface else value.color
     var bgColor = createPastelColor(color)
@@ -43,10 +49,10 @@ fun LabelDropdown(modifier: Modifier = Modifier, labels: List<Label>, fontSize :
             .clip(RoundedCornerShape(10.dp))
             .background(color = bgColor)
             .padding((fontSize.value/2).dp)
-            .clickable{isExpanded = true},
+            .clickable{ if(!readOnly) isExpanded = true},
             contentAlignment = Alignment.Center
         ){
-            Text(text = if (value == null) "Select Label" else value.name, fontSize = fontSize, color= color)
+            Text(text = value?.name ?: "Select Label", fontSize = fontSize, color= color)
         }
 
         DropdownMenu(

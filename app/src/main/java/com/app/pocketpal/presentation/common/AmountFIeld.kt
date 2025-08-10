@@ -39,9 +39,10 @@ import com.app.pocketpal.presentation.ui.theme.ThemeColor
 
 @Composable
 fun AmountTextField(modifier: Modifier = Modifier,fontSize: TextUnit = 18.sp, value: String, onValueChange: (String) -> Unit = {}, readOnly: Boolean = false) {
+
     TextField(value =  value,
         onValueChange = {onValueChange(it)},
-        placeholder = {Text(text = "0", fontSize = fontSize, fontWeight = FontWeight.Bold, color = Color.Gray)},
+        placeholder = {Text(text = "0", fontSize = fontSize, fontWeight = FontWeight.Bold, color = Color.LightGray)},
         modifier = modifier
                 .widthIn(min = 100.dp , max = 160.dp)
                 .padding(vertical = (fontSize.value/2).dp, horizontal = (fontSize.value/2).dp)

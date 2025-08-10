@@ -17,5 +17,4 @@ class ExpenseRepoImpl @Inject constructor(
     override suspend fun getAllExpenses(): Flow<List<Expense>> {
         return expenseDao.getExpenses()
     }
-
 }

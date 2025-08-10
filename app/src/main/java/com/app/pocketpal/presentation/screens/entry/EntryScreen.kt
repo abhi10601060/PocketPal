@@ -1,7 +1,6 @@
 package com.app.pocketpal.presentation.screens.entry
 
 import android.Manifest
-import android.R
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.widget.Toast
@@ -22,31 +21,22 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,13 +54,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import co.yml.charts.common.extensions.isNotNull
 import com.app.pocketpal.constant.LABEL_LIST
 import com.app.pocketpal.constant.uriToBitmap
-import com.app.pocketpal.di.DiTest
-import com.app.pocketpal.domain.model.Label
+import com.app.pocketpal.data.room.model.Expense
 import com.app.pocketpal.presentation.common.AmountTextField
 import com.app.pocketpal.presentation.common.LabelDropdown
 import com.app.pocketpal.presentation.common.PocketPalTextField
@@ -78,7 +65,20 @@ import com.app.pocketpal.presentation.ui.theme.LightAccent
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
 
 @Composable
-fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= hiltViewModel(key = "" + System.currentTimeMillis()), todayTotal : Int,onCancelClicked: () -> Unit) {
+fun EntryScreen(modifier: Modifier = Modifier,
+                viewModel: EntryScreenViewModel= hiltViewModel(key = "" + System.currentTimeMillis()),
+                todayTotal : Int, onCancelClicked: () -> Unit,
+                isViewModeOn : Boolean = false,
+                viewExpense : Expense? = null
+) {
+
+    LaunchedEffect(key1 = true) {
+        if (isViewModeOn){
+            viewExpense?.let {
+                viewModel.loadDataForExpense(expense = it)
+            }
+        }
+    }
 
     Dialog(
         onDismissRequest = { /* Handle dismiss request */ },
@@ -113,7 +113,7 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Text(text = "Today's Total - ₹${todayTotal}", fontSize = 19.sp, fontWeight = FontWeight.Bold)
+                Text(text = if(isViewModeOn) "Expense Details" else "Today's Total - ₹${todayTotal}", fontSize = 19.sp, fontWeight = FontWeight.Bold)
                 EntryScreenOptions(onCancelClicked = onCancelClicked)
             }
 
@@ -122,14 +122,22 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
             Text(text = "Title", fontSize = 19.sp, fontWeight = FontWeight.Bold)
             PocketPalTextField( modifier
                 .padding(top = 5.dp)
-                .fillMaxWidth(), value = viewModel.title, singleLine = true, onValueChange = {viewModel.title = it.trim()})
+                .fillMaxWidth(),
+                readOnly = isViewModeOn,
+                value = viewModel.title,
+                singleLine = true,
+                onValueChange = {viewModel.title = it.trim()})
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(text = "Description", fontSize = 19.sp, fontWeight = FontWeight.Bold)
             PocketPalTextField( modifier
                 .padding(top = 5.dp)
-                .fillMaxWidth(), value = viewModel.description, onValueChange = {viewModel.description = it}, singleLine = false, minLines = 5)
+                .fillMaxWidth(),
+                readOnly = isViewModeOn,
+                value = viewModel.description,
+                onValueChange = {viewModel.description = it},
+                singleLine = false, minLines = 5)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -141,16 +149,16 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
                     modifier = Modifier.weight(0.4f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "Add Label", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    LabelDropdown(modifier = Modifier.padding(top = 5.dp), labels = LABEL_LIST, value = viewModel.selectedLabel) { label->  viewModel.selectedLabel = label}
+                    Text(text =if (isViewModeOn) "Label" else "Add Label", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    LabelDropdown(modifier = Modifier.padding(top = 5.dp), labels = LABEL_LIST, value = viewModel.selectedLabel, readOnly = isViewModeOn) { label->  viewModel.selectedLabel = label}
                 }
 
                 Column(
                     modifier = Modifier.weight(0.6f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "Enter Amount", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    AmountTextField(value = viewModel.amount.toString(), onValueChange = {viewModel.amount = if (it.isEmpty()) 0 else it.trim().toInt()}, fontSize = 18.sp)
+                    Text(text = if (isViewModeOn) "Amount" else "Enter Amount", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    AmountTextField(value = viewModel.amount.toString(), onValueChange = {viewModel.amount = if (it.isEmpty()) 0 else it.trim().toInt() }, fontSize = 18.sp, readOnly = isViewModeOn)
                 }
             }
 

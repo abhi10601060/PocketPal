@@ -24,6 +24,7 @@ class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpen
     val listOfExpenses : StateFlow<List<Expense>> = _listOfExpenses
     var todayAmount = 0
 
+
     init {
         viewModelScope.launch {
             getAllExpenseUseCase().collect { it ->
