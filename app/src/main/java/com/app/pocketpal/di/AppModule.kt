@@ -7,6 +7,7 @@ import com.app.pocketpal.data.room.dao.ExpenseDao
 
 import com.app.pocketpal.data.room.db.ExpenseDB
 import com.app.pocketpal.domain.repo.ExpenseRepo
+import com.app.pocketpal.domain.use_case.delete_expense.DeleteExpenseUseCase
 import com.app.pocketpal.domain.use_case.get_expense_images.GetExpenseImagesUseCase
 import com.app.pocketpal.domain.use_case.save_images.SaveImagesUseCase
 import dagger.Module
@@ -49,6 +50,11 @@ object AppModule {
     @Provides
     fun providesGetExpenseImagesUseCase(@ApplicationContext context: Context) : GetExpenseImagesUseCase{
         return GetExpenseImagesUseCase(context)
+    }
+
+    @Provides
+    fun provideDeleteExpenseUseCase(@ApplicationContext context: Context, expenseRepo: ExpenseRepo) : DeleteExpenseUseCase{
+        return DeleteExpenseUseCase(expenseRepo, context)
     }
 }
 
