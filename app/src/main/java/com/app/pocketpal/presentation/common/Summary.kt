@@ -84,10 +84,10 @@ fun SpendingLegend(
         }
 
         // Legend items
-        LazyColumn(
+        Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(spendingByLabel) { legend ->
+            spendingByLabel.forEach { legend ->
                 LegendItem(
                     legend = legend,
                     modifier = Modifier.fillMaxWidth()

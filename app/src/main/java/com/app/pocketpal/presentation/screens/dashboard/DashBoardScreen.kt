@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,23 +48,26 @@ fun DashboardScreen(
     val expensePieChartData by viewModel.pieChartData.collectAsState()
     val allExpenses by viewModel.listOfExpenses.collectAsState()
 
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
     ) {
-        if (allExpenses.isNotEmpty()){
-            val pieChartData = mutableListOf<PieChartData.Slice>()
-            expensePieChartData.forEach {
-                pieChartData.add(it.toPieChartSlice())
+        item {
+            if (allExpenses.isNotEmpty()){
+                val pieChartData = mutableListOf<PieChartData.Slice>()
+                expensePieChartData.forEach {
+                    pieChartData.add(it.toPieChartSlice())
+                }
+                Text("Last 7 Days Overview", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                SimpleDonutChart(pieChartData)
+                SpendingLegend(expenses = expensePieChartData)
+            }else{
+                Text(text = "No Data Found",
+                    modifier = Modifier,
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.error)
             }
-            SimpleDonutChart(pieChartData)
-            SpendingLegend(expenses = expensePieChartData)
-        }else{
-            Text(text = "No Data Found",
-                modifier = Modifier,
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.error)
         }
     }
 }
