@@ -1,9 +1,13 @@
 package com.app.pocketpal.presentation.screens.history
 
 import android.annotation.SuppressLint
+import android.icu.text.DateFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,10 +28,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.yml.charts.common.extensions.isNotNull
+import com.app.pocketpal.constant.dateStringToMillis
 import com.app.pocketpal.data.room.model.Expense
+import com.app.pocketpal.presentation.common.DateRangeSelector
 import com.app.pocketpal.presentation.screens.entry.EntryScreen
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
 import com.app.pocketpal.presentation.ui.theme.ThemeColor
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -46,20 +56,28 @@ fun HistoryScreen(
             .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
-        LazyColumn (
-            modifier = Modifier.fillMaxSize()
-        ){
-            items(items = list) {
-                ExpenseItem(modifier = Modifier.clickable{if(!showEntryDialog) viewExpense = it else viewExpense = null},expense = it)
+        Column(modifier = Modifier.fillMaxSize()) {
+
+            HistoryFilter()
+
+            LazyColumn (
+                modifier = Modifier.fillMaxSize()
+            ){
+                items(items = list) {
+                    ExpenseItem(modifier = Modifier.clickable{if(!showEntryDialog) viewExpense = it else viewExpense = null},expense = it)
+                }
             }
         }
+
 
         if (!showEntryDialog) {
             FloatingActionButton(
                 onClick = {
                     showEntryDialog = true
                 },
-                modifier = modifier.align(Alignment.BottomEnd).padding(end = 30.dp, bottom = 30.dp),
+                modifier = modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 30.dp, bottom = 30.dp),
                 containerColor = ThemeColor,
                 contentColor = Color.White,
                 elevation = FloatingActionButtonDefaults.elevation(
@@ -85,6 +103,30 @@ fun HistoryScreen(
 
     if (viewExpense.isNotNull()){
         EntryScreen(todayTotal = viewModel.todayAmount ,onCancelClicked = {viewExpense = null}, isViewModeOn = true, viewExpense = viewExpense)
+    }
+}
+
+@Composable
+fun HistoryFilter(modifier: Modifier = Modifier, onStartDateChanged: (Long) -> Unit = {}, onEndDateChanged: (Long) -> Unit = {}) {
+    var startDate by remember { mutableStateOf(LocalDate.now().minusDays(7)) }
+    var endDate by remember { mutableStateOf(LocalDate.now()) }
+
+    val dateFormatter= DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+    Row(
+        modifier= Modifier.fillMaxWidth()
+    ) {
+        DateRangeSelector(
+            startDate = startDate,
+            endDate =  endDate,
+            onStartDateChange = { date->
+                    onStartDateChanged(dateStringToMillis(date))
+                    startDate = LocalDate.parse(date, dateFormatter)
+                },
+            onEndDateChange = { date->
+                    onEndDateChanged(dateStringToMillis(date))
+                    endDate = LocalDate.parse(date, dateFormatter)
+                }
+        )
     }
 }
 

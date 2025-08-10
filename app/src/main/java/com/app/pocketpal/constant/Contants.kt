@@ -14,6 +14,9 @@ import com.app.pocketpal.presentation.ui.theme.YellowSurface
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 val MAIN_SCREEN_TABS = listOf("Dashboard", "History")
 
@@ -68,4 +71,10 @@ fun uriToBitmap(context: Context, uri: Uri): Bitmap? {
         e.printStackTrace()
         null
     }
+}
+
+fun dateStringToMillis(string: String) : Long{
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val date = LocalDate.parse(string, formatter)
+    return date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }

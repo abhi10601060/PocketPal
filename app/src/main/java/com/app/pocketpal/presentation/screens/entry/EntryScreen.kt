@@ -164,7 +164,7 @@ fun EntryScreen(modifier: Modifier = Modifier,
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            ImageCaptureOptions(){ bitmap ->
+            ImageCaptureOptions(isViewModeOn = isViewModeOn){ bitmap ->
                 viewModel.images.add(bitmap)
             }
 
@@ -172,21 +172,23 @@ fun EntryScreen(modifier: Modifier = Modifier,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 itemsIndexed (viewModel.images.toList()) { _, bm ->
-                    ImageCardWithCancel(bitmap = bm, onRemove = {viewModel.images.remove(bm)})
+                    ImageCardWithCancel(bitmap = bm, isViewModeOn= isViewModeOn, onRemove = {viewModel.images.remove(bm)})
                 }
 
             }
 
         }
 
-        Box(modifier = Modifier.fillMaxSize()){
-            Button(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 40.dp),
-                onClick = { viewModel.saveData() }
-            ) {
-                Text(text = "Save")
+        if (!isViewModeOn){
+            Box(modifier = Modifier.fillMaxSize()){
+                Button(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 40.dp),
+                    onClick = { viewModel.saveData() }
+                ) {
+                    Text(text = "Save")
+                }
             }
         }
     }
@@ -242,7 +244,7 @@ fun ErrorDialog(
 }
 
 @Composable
-fun ImageCaptureOptions(modifier: Modifier = Modifier, onImageAdded : (Bitmap) -> Unit ) {
+fun ImageCaptureOptions(modifier: Modifier = Modifier, isViewModeOn: Boolean = false, onImageAdded : (Bitmap) -> Unit ) {
     val context = LocalContext.current
 
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -282,28 +284,30 @@ fun ImageCaptureOptions(modifier: Modifier = Modifier, onImageAdded : (Bitmap) -
     ) {
         Text(text = "Add Receipt", fontSize = 19.sp, fontWeight = FontWeight.Bold)
 
-        Row {
-            Icon(modifier = Modifier.clickable{
-                val permission = Manifest.permission.CAMERA
-                if (ContextCompat.checkSelfPermission(context, permission)
-                    == PackageManager.PERMISSION_GRANTED) {
-                    cameraLauncher.launch(null)
-                } else {
-                    cameraPermissionLauncher.launch(permission)
-                }
+        if(!isViewModeOn){
+            Row {
+                Icon(modifier = Modifier.clickable{
+                    val permission = Manifest.permission.CAMERA
+                    if (ContextCompat.checkSelfPermission(context, permission)
+                        == PackageManager.PERMISSION_GRANTED) {
+                        cameraLauncher.launch(null)
+                    } else {
+                        cameraPermissionLauncher.launch(permission)
+                    }
                 },
-                imageVector = Icons.Default.PhotoCamera,
-                contentDescription = "camera"
-            )
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = "camera"
+                )
 
-            Spacer(modifier = Modifier.width(20.dp))
+                Spacer(modifier = Modifier.width(20.dp))
 
-            Icon(modifier = Modifier.clickable{
-                galleryLauncher.launch("image/*")
+                Icon(modifier = Modifier.clickable{
+                    galleryLauncher.launch("image/*")
                 },
-                imageVector = Icons.Default.Upload,
-                contentDescription = "upload"
-            )
+                    imageVector = Icons.Default.Upload,
+                    contentDescription = "upload"
+                )
+            }
         }
     }
 }
@@ -312,7 +316,8 @@ fun ImageCaptureOptions(modifier: Modifier = Modifier, onImageAdded : (Bitmap) -
 fun ImageCardWithCancel(
     bitmap: Bitmap,
     onRemove: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isViewModeOn : Boolean = false
 ) {
     Surface ( modifier = modifier.padding(10.dp), shadowElevation = 10.dp ) {
         Box(
@@ -324,13 +329,14 @@ fun ImageCardWithCancel(
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-
-            Icon(
-                modifier = Modifier.size(30.dp).offset(y = 0.dp).align(Alignment.BottomCenter).clickable{onRemove()},
-                imageVector = Icons.Outlined.Cancel,
-                contentDescription = "Remove Image",
-                tint = MaterialTheme.colorScheme.error,
-            )
+            if (!isViewModeOn){
+                Icon(
+                    modifier = Modifier.size(30.dp).offset(y = 0.dp).align(Alignment.BottomCenter).clickable{onRemove()},
+                    imageVector = Icons.Outlined.Cancel,
+                    contentDescription = "Remove Image",
+                    tint = MaterialTheme.colorScheme.error,
+                )
+            }
         }
     }
 }
