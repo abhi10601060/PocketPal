@@ -2,6 +2,7 @@ package com.app.pocketpal.presentation.screens.history
 
 import android.annotation.SuppressLint
 import android.icu.text.DateFormat
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -118,7 +119,12 @@ fun HistoryScreen(
     }
 
     if (viewExpense.isNotNull()){
-        EntryScreen(todayTotal = viewModel.todayAmount ,onCancelClicked = {viewExpense = null}, isViewModeOn = true, viewExpense = viewExpense)
+        EntryScreen(todayTotal = viewModel.todayAmount ,
+            onCancelClicked = {viewExpense = null},
+            onDeleteClicked = { id ->
+                viewModel.deleteExpense(id)
+                viewExpense = null }
+            ,isViewModeOn = true, viewExpense = viewExpense)
     }
 }
 

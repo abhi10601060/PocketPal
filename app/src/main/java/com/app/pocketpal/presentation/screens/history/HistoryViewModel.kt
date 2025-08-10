@@ -6,17 +6,19 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.pocketpal.data.room.model.Expense
+import com.app.pocketpal.domain.use_case.delete_expense.DeleteExpenseUseCase
 import com.app.pocketpal.domain.use_case.filter_by_days.FilterByDaysUseCase
 import com.app.pocketpal.domain.use_case.get_all_expense.GetAllExpenseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @HiltViewModel
-class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpenseUseCase, val filterByDaysUseCase: FilterByDaysUseCase) : ViewModel() {
+class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpenseUseCase, val filterByDaysUseCase: FilterByDaysUseCase, val deleteExpenseUseCase: DeleteExpenseUseCase) : ViewModel() {
 
     private val _listOfExpenses = MutableStateFlow<List<Expense>>(emptyList())
     val listOfExpenses : StateFlow<List<Expense>> = _listOfExpenses
@@ -78,6 +80,12 @@ class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpen
             filterByDaysUseCase.invoke(listOfExpenses.value, startDate, endDate).collect {
                 _filteredListOfExpenses.emit(it)
             }
+        }
+    }
+
+    fun deleteExpense(id : String){
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteExpenseUseCase.invoke(id)
         }
     }
 }

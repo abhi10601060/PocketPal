@@ -3,6 +3,7 @@ package com.app.pocketpal.presentation.screens.entry
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +27,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.outlined.Cancel
@@ -70,7 +72,9 @@ import com.app.pocketpal.presentation.ui.theme.ThemeColor
 @Composable
 fun EntryScreen(modifier: Modifier = Modifier,
                 viewModel: EntryScreenViewModel= hiltViewModel(key = "" + System.currentTimeMillis()),
-                todayTotal : Int, onCancelClicked: () -> Unit,
+                todayTotal : Int,
+                onCancelClicked: () -> Unit,
+                onDeleteClicked: (id : String) -> Unit = {},
                 isViewModeOn : Boolean = false,
                 viewExpense : Expense? = null
 ) {
@@ -117,7 +121,7 @@ fun EntryScreen(modifier: Modifier = Modifier,
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(text = if(isViewModeOn) "Expense Details" else "Today's Total - ₹${todayTotal}", fontSize = 19.sp, fontWeight = FontWeight.Bold)
-                EntryScreenOptions(onCancelClicked = onCancelClicked)
+                EntryScreenOptions(onCancelClicked = onCancelClicked, onDeleteClicked = { Log.d("TAG", "EntryScreen: delete clicked 1"); onDeleteClicked(viewExpense!!.id) },isViewModeOn = isViewModeOn)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -200,9 +204,16 @@ fun EntryScreen(modifier: Modifier = Modifier,
 
 
 @Composable
-fun EntryScreenOptions(modifier: Modifier = Modifier, onCancelClicked: () -> Unit = {}, onEditClicked: () -> Unit = {}){
-    Row(modifier = modifier,
+fun EntryScreenOptions(modifier: Modifier = Modifier, isViewModeOn: Boolean = false,  onCancelClicked: () -> Unit = {}, onDeleteClicked: () -> Unit = {} ,onEditClicked: () -> Unit = {}){
+    Row(
+        modifier = modifier,
     ) {
+        if (isViewModeOn){
+            Icon(modifier = modifier
+                .padding(end = 15.dp)
+                .alpha(0.8f)
+                .clickable { Log.d("TAG", "HistoryScreen: delete clicked 2") ; onDeleteClicked() }, imageVector = Icons.Default.DeleteForever, contentDescription = "delete", tint = Color.Red)
+        }
         Icon(modifier = modifier
             .alpha(0.8f)
             .clickable { onCancelClicked() }, imageVector = Icons.Default.Cancel, contentDescription = "close", tint = Color.Red)
@@ -350,7 +361,7 @@ fun ImageCardWithCancel(
 @Composable
 private fun EntryScreenPrev() {
     PocketPalTheme {
-        EntryScreen(todayTotal = 100,onCancelClicked = {})
+        EntryScreen(todayTotal = 100,onCancelClicked = {}, onDeleteClicked = {})
 //        ErrorDialog("dada") { }
     }
 }
