@@ -4,15 +4,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import androidx.compose.ui.graphics.Color
 import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.presentation.ui.theme.GreenSurface
 import com.app.pocketpal.presentation.ui.theme.YellowSurface
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.time.LocalDate
 import java.time.ZoneId
@@ -72,6 +70,12 @@ fun uriToBitmap(context: Context, uri: Uri): Bitmap? {
         null
     }
 }
+
+fun Bitmap.rotate(degrees: Float): Bitmap {
+    val matrix = Matrix().apply { postRotate(degrees) }
+    return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+}
+
 
 fun dateStringToMillis(string: String) : Long{
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")

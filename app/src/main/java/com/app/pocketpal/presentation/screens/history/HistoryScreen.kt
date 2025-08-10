@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
@@ -48,7 +50,11 @@ fun HistoryScreen(
 ) {
     var showEntryDialog by remember { mutableStateOf(false) }
     var viewExpense by remember { mutableStateOf<Expense?>(null) }
-    val list by viewModel.listOfExpenses.collectAsState()
+    val list by viewModel.filteredListOfExpenses.collectAsState()
+
+    LaunchedEffect(viewModel.startDate, viewModel.endDate){
+        viewModel.filterWhenDateChanges()
+    }
 
     Box(
         modifier = modifier
@@ -58,7 +64,7 @@ fun HistoryScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            HistoryFilter()
+            HistoryFilter(startDate = viewModel.startDate, endDate = viewModel.endDate, onStartDateChanged = {viewModel.startDate = it}, onEndDateChanged = {viewModel.endDate = it})
 
             LazyColumn (
                 modifier = Modifier.fillMaxSize()
@@ -68,7 +74,6 @@ fun HistoryScreen(
                 }
             }
         }
-
 
         if (!showEntryDialog) {
             FloatingActionButton(
@@ -95,6 +100,14 @@ fun HistoryScreen(
                 )
             }
         }
+
+        if (list.isEmpty()){
+            Text(text = "No Data Found",
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.align(
+                Alignment.Center)
+            )
+        }
     }
 
     if (showEntryDialog){
@@ -107,9 +120,7 @@ fun HistoryScreen(
 }
 
 @Composable
-fun HistoryFilter(modifier: Modifier = Modifier, onStartDateChanged: (Long) -> Unit = {}, onEndDateChanged: (Long) -> Unit = {}) {
-    var startDate by remember { mutableStateOf(LocalDate.now().minusDays(7)) }
-    var endDate by remember { mutableStateOf(LocalDate.now()) }
+fun HistoryFilter(modifier: Modifier = Modifier, startDate: LocalDate, endDate : LocalDate ,  onStartDateChanged: (LocalDate) -> Unit = {}, onEndDateChanged: (LocalDate) -> Unit = {}) {
 
     val dateFormatter= DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
     Row(
@@ -119,12 +130,12 @@ fun HistoryFilter(modifier: Modifier = Modifier, onStartDateChanged: (Long) -> U
             startDate = startDate,
             endDate =  endDate,
             onStartDateChange = { date->
-                    onStartDateChanged(dateStringToMillis(date))
-                    startDate = LocalDate.parse(date, dateFormatter)
+                    val newStartDate = LocalDate.parse(date, dateFormatter)
+                    onStartDateChanged(newStartDate)
                 },
             onEndDateChange = { date->
-                    onEndDateChanged(dateStringToMillis(date))
-                    endDate = LocalDate.parse(date, dateFormatter)
+                    val newEndDate = LocalDate.parse(date, dateFormatter)
+                    onEndDateChanged(newEndDate)
                 }
         )
     }
@@ -134,6 +145,6 @@ fun HistoryFilter(modifier: Modifier = Modifier, onStartDateChanged: (Long) -> U
 @Composable
 private fun HistoryScreenPrev() {
     PocketPalTheme {
-        HistoryScreen(isDarkTheme = false)
+        HistoryScreen()
     }
 }

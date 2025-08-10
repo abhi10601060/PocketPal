@@ -56,6 +56,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.yml.charts.common.extensions.isNotNull
 import com.app.pocketpal.constant.LABEL_LIST
+import com.app.pocketpal.constant.rotate
 import com.app.pocketpal.constant.uriToBitmap
 import com.app.pocketpal.data.room.model.Expense
 import com.app.pocketpal.presentation.common.AmountTextField
@@ -251,7 +252,7 @@ fun ImageCaptureOptions(modifier: Modifier = Modifier, isViewModeOn: Boolean = f
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
         bitmap?.let {
-            onImageAdded(it)
+            onImageAdded(it.rotate(90f))
         }
     }
 

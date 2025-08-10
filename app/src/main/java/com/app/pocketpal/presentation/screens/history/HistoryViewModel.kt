@@ -16,12 +16,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpenseUseCase, val filterByDaysUseCase: FilterByDaysUseCase) : ViewModel() {
 
     private val _listOfExpenses = MutableStateFlow<List<Expense>>(emptyList())
     val listOfExpenses : StateFlow<List<Expense>> = _listOfExpenses
+
+    private val _filteredListOfExpenses = MutableStateFlow<List<Expense>>(emptyList())
+    val filteredListOfExpenses : StateFlow<List<Expense>> = _filteredListOfExpenses
+
+    var startDate by mutableStateOf(LocalDate.now().minusDays(7))
+    var endDate by mutableStateOf(LocalDate.now())
+
     var todayAmount = 0
 
 
@@ -32,14 +40,33 @@ class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpen
             }
         }
         getTodayAmount()
+        filterExpenses()
     }
 
     fun getTodayAmount(){
         viewModelScope.launch {
             listOfExpenses.collect{
-                filterByDaysUseCase.invoke(it, 1).collect {
+                filterByDaysUseCase.invoke(it, LocalDate.now(), LocalDate.now()).collect {
                     todayAmount = it.sumOf { it.amount }
                 }
+            }
+        }
+    }
+
+    fun filterExpenses(){
+        viewModelScope.launch {
+            _listOfExpenses.collect{
+                filterByDaysUseCase.invoke(it, startDate, endDate).collect {
+                    _filteredListOfExpenses.emit(it)
+                }
+            }
+        }
+    }
+
+    fun filterWhenDateChanges(){
+        viewModelScope.launch {
+            filterByDaysUseCase.invoke(listOfExpenses.value, startDate, endDate).collect {
+                _filteredListOfExpenses.emit(it)
             }
         }
     }
