@@ -133,7 +133,7 @@ fun EntryScreen(modifier: Modifier = Modifier,
                 readOnly = isViewModeOn,
                 value = viewModel.title,
                 singleLine = true,
-                onValueChange = {viewModel.title = it.trim()})
+                onValueChange = {viewModel.title = it})
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -143,7 +143,7 @@ fun EntryScreen(modifier: Modifier = Modifier,
                 .fillMaxWidth(),
                 readOnly = isViewModeOn,
                 value = viewModel.description,
-                onValueChange = {viewModel.description = it},
+                onValueChange = {viewModel.description = if(it.length <= 100 ) it else viewModel.description},
                 singleLine = false, minLines = 5)
 
             Spacer(modifier = Modifier.height(20.dp))
