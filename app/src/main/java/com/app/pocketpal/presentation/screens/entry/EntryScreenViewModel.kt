@@ -1,5 +1,6 @@
 package com.app.pocketpal.presentation.screens.entry
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import coil3.Bitmap
 import com.app.pocketpal.data.room.model.Expense
 import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.domain.use_case.get_all_expense.GetAllExpenseUseCase
+import com.app.pocketpal.domain.use_case.save_images.SaveImagesUseCase
 import com.app.pocketpal.domain.use_case.upsert_expense.UpsertUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -20,7 +22,7 @@ import kotlinx.coroutines.launch
 
 
 @HiltViewModel
-class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertUseCase, val getAllExpenseUseCase: GetAllExpenseUseCase) : ViewModel() {
+class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertUseCase, val getAllExpenseUseCase: GetAllExpenseUseCase, val saveImagesUseCase: SaveImagesUseCase) : ViewModel() {
 
     var title by mutableStateOf("")
     var description by mutableStateOf("")
@@ -39,6 +41,7 @@ class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertU
                 upsertExpenseUseCase.invoke(expense).collect {
                     if (it){
                         entryScreenState = EntryScreenState(success = true)
+                        saveImagesUseCase.invoke(images.toList(), expense.id).collect {  }
                     }
                     else{
                         entryScreenState = EntryScreenState(error = "Something went wrong")

@@ -7,6 +7,7 @@ import com.app.pocketpal.data.room.dao.ExpenseDao
 
 import com.app.pocketpal.data.room.db.ExpenseDB
 import com.app.pocketpal.domain.repo.ExpenseRepo
+import com.app.pocketpal.domain.use_case.save_images.SaveImagesUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +38,11 @@ object AppModule {
     @Provides
     fun provideExpenseRepo(expenseDao: ExpenseDao) : ExpenseRepo{
         return ExpenseRepoImpl(expenseDao)
+    }
+
+    @Provides
+    fun providesSaveImagesUseCase(@ApplicationContext context: Context) : SaveImagesUseCase{
+        return SaveImagesUseCase(context)
     }
 }
 

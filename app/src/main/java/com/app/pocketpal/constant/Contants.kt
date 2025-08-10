@@ -6,10 +6,13 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import androidx.compose.ui.graphics.Color
 import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.presentation.ui.theme.GreenSurface
 import com.app.pocketpal.presentation.ui.theme.YellowSurface
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 
 val MAIN_SCREEN_TABS = listOf("Dashboard", "History")
