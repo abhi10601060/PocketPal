@@ -3,6 +3,7 @@ package com.app.pocketpal.presentation.screens.history
 import android.annotation.SuppressLint
 import android.icu.text.DateFormat
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -64,7 +67,7 @@ fun HistoryScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            HistoryFilter(startDate = viewModel.startDate, endDate = viewModel.endDate, onStartDateChanged = {viewModel.startDate = it}, onEndDateChanged = {viewModel.endDate = it})
+            HistoryFilter(expenseCount = viewModel.filteredExpenseCount, totalAmount = viewModel.filteredExpenseAmount, startDate = viewModel.startDate, endDate = viewModel.endDate, onStartDateChanged = {viewModel.startDate = it}, onEndDateChanged = {viewModel.endDate = it})
 
             LazyColumn (
                 modifier = Modifier.fillMaxSize()
@@ -120,11 +123,19 @@ fun HistoryScreen(
 }
 
 @Composable
-fun HistoryFilter(modifier: Modifier = Modifier, startDate: LocalDate, endDate : LocalDate ,  onStartDateChanged: (LocalDate) -> Unit = {}, onEndDateChanged: (LocalDate) -> Unit = {}) {
+fun HistoryFilter(modifier: Modifier = Modifier,
+                  expenseCount : Int = 0,
+                  totalAmount : Int = 0,
+                  startDate: LocalDate,
+                  endDate : LocalDate ,
+                  onStartDateChanged: (LocalDate) -> Unit = {},
+                  onEndDateChanged: (LocalDate) -> Unit = {}) {
 
     val dateFormatter= DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
     Row(
-        modifier= Modifier.fillMaxWidth()
+        modifier= Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         DateRangeSelector(
             startDate = startDate,
@@ -138,6 +149,8 @@ fun HistoryFilter(modifier: Modifier = Modifier, startDate: LocalDate, endDate :
                     onEndDateChanged(newEndDate)
                 }
         )
+
+        Text("Total Bills- ${expenseCount} \n Total Amount- ₹${totalAmount}", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
     }
 }
 

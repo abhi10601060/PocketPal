@@ -45,13 +45,10 @@ fun DateRangeSelector(
 
     Row(
         modifier = modifier
-            .fillMaxWidth()
             .padding(4.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "Start Date ", fontSize = 15.sp)
-
         Text(
             text = startDate.format(dateFormatter),
             modifier = Modifier
@@ -66,7 +63,7 @@ fun DateRangeSelector(
         )
 
         // Separator
-        Text(text = " - End Date ", fontSize = 15.sp)
+        Text(text = " - ", fontSize = 15.sp)
 
         // End Date
         Text(

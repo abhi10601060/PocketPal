@@ -1,7 +1,6 @@
 package com.app.pocketpal.presentation.screens.history
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -13,9 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 @HiltViewModel
@@ -30,6 +27,9 @@ class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpen
     var startDate by mutableStateOf(LocalDate.now().minusDays(7))
     var endDate by mutableStateOf(LocalDate.now())
 
+    var filteredExpenseCount by mutableStateOf(0)
+    var filteredExpenseAmount by mutableStateOf(0)
+
     var todayAmount = 0
 
 
@@ -40,7 +40,17 @@ class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpen
             }
         }
         getTodayAmount()
-        filterExpenses()
+        filterExpensesOnListChange()
+        getFilteredExpenseCountAndAmount()
+    }
+
+    private fun getFilteredExpenseCountAndAmount() {
+        viewModelScope.launch {
+            filteredListOfExpenses.collect {
+                filteredExpenseCount = it.size
+                filteredExpenseAmount = it.sumOf { it.amount }
+            }
+        }
     }
 
     fun getTodayAmount(){
@@ -53,7 +63,7 @@ class HistoryViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExpen
         }
     }
 
-    fun filterExpenses(){
+    fun filterExpensesOnListChange(){
         viewModelScope.launch {
             _listOfExpenses.collect{
                 filterByDaysUseCase.invoke(it, startDate, endDate).collect {

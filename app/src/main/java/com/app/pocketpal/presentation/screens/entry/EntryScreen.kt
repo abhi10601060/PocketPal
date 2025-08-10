@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -64,6 +65,7 @@ import com.app.pocketpal.presentation.common.LabelDropdown
 import com.app.pocketpal.presentation.common.PocketPalTextField
 import com.app.pocketpal.presentation.ui.theme.LightAccent
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
+import com.app.pocketpal.presentation.ui.theme.ThemeColor
 
 @Composable
 fun EntryScreen(modifier: Modifier = Modifier,
@@ -186,7 +188,8 @@ fun EntryScreen(modifier: Modifier = Modifier,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 40.dp),
-                    onClick = { viewModel.saveData() }
+                    onClick = { viewModel.saveData() },
+                    colors = ButtonDefaults.buttonColors(containerColor = ThemeColor)
                 ) {
                     Text(text = "Save")
                 }
@@ -322,7 +325,7 @@ fun ImageCardWithCancel(
 ) {
     Surface ( modifier = modifier.padding(10.dp), shadowElevation = 10.dp ) {
         Box(
-            modifier = Modifier.padding(horizontal = 5.dp).size(width = 150.dp, 220.dp),
+            modifier = Modifier.padding(horizontal = 5.dp).size(width = 140.dp, 200.dp),
         ) {
             Image(
                 bitmap = bitmap.asImageBitmap(),
