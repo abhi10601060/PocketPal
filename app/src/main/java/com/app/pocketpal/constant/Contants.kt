@@ -12,9 +12,12 @@ import com.app.pocketpal.domain.model.Label
 import com.app.pocketpal.presentation.ui.theme.GreenSurface
 import com.app.pocketpal.presentation.ui.theme.YellowSurface
 import java.io.IOException
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 val MAIN_SCREEN_TABS = listOf("Dashboard", "History")
 
@@ -74,6 +77,11 @@ fun uriToBitmap(context: Context, uri: Uri): Bitmap? {
 fun Bitmap.rotate(degrees: Float): Bitmap {
     val matrix = Matrix().apply { postRotate(degrees) }
     return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+}
+
+fun millisToDate(millis : Long, stringFormat : String = "yyyy-MM-dd HH:mm") : String{
+    val formatter = SimpleDateFormat(stringFormat, Locale.getDefault())
+    return formatter.format(Date(millis))
 }
 
 

@@ -106,9 +106,7 @@ private fun SimpleDonutChart(slices: List<PieChartData.Slice>) {
                 .height(400.dp),
             data,
             pieChartConfig
-        ) { slice ->
-            Toast.makeText(context, slice.label, Toast.LENGTH_LONG).show()
-        }
+        ) { slice -> }
     }
 }
 

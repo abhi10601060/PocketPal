@@ -23,14 +23,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.pocketpal.constant.getColorForLable
+import com.app.pocketpal.constant.millisToDate
 import com.app.pocketpal.data.room.model.Expense
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
 
 @Composable
 fun ExpenseItem(
     expense: Expense,
-    onEditClick: (Expense) -> Unit = {},
-    onDeleteClick: (Expense) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -92,7 +91,7 @@ fun ExpenseItem(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "12/30/404",
+                        text = millisToDate(expense.createdAt, "MMM dd, yy - hh:mm a"),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
