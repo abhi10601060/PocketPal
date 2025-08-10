@@ -19,8 +19,8 @@ class DashBoardViewModel @Inject constructor(val getAllExpenseUseCase: GetAllExp
     private val _listOfExpenses = MutableStateFlow<List<Expense>>(emptyList())
     val listOfExpenses : StateFlow<List<Expense>> = _listOfExpenses
 
-    private val _pieChartData = MutableStateFlow<List<PieChartData.Slice>>(emptyList())
-    val pieChartData : StateFlow<List<PieChartData.Slice>> = _pieChartData
+    private val _pieChartData = MutableStateFlow<List<ExpensePieChartData>>(emptyList())
+    val pieChartData : StateFlow<List<ExpensePieChartData>> = _pieChartData
 
     init {
         viewModelScope.launch {

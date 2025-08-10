@@ -29,6 +29,8 @@ import co.yml.charts.common.utils.DataUtils
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
+import com.app.pocketpal.domain.model.toPieChartSlice
+import com.app.pocketpal.presentation.common.SpendingLegend
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -39,18 +41,26 @@ fun DashboardScreen(
     viewModel: DashBoardViewModel = hiltViewModel()
 ) {
 
-    val pieChartData by viewModel.pieChartData.collectAsState()
+    val expensePieChartData by viewModel.pieChartData.collectAsState()
     val allExpenses by viewModel.listOfExpenses.collectAsState()
 
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
     ) {
         if (allExpenses.isNotEmpty()){
+            val pieChartData = mutableListOf<PieChartData.Slice>()
+            expensePieChartData.forEach {
+                pieChartData.add(it.toPieChartSlice())
+            }
             SimpleDonutChart(pieChartData)
+            SpendingLegend(expenses = expensePieChartData)
         }else{
-            Text(text = "No Data Found", modifier = Modifier.align(Alignment.Center), style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.error)
+            Text(text = "No Data Found",
+                modifier = Modifier,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.error)
         }
     }
 }
