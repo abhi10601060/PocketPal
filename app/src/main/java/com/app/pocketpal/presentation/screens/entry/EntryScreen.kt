@@ -78,7 +78,7 @@ import com.app.pocketpal.presentation.ui.theme.LightAccent
 import com.app.pocketpal.presentation.ui.theme.PocketPalTheme
 
 @Composable
-fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= hiltViewModel(key = "" + System.currentTimeMillis()), onCancelClicked: () -> Unit) {
+fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= hiltViewModel(key = "" + System.currentTimeMillis()), todayTotal : Int,onCancelClicked: () -> Unit) {
 
     Dialog(
         onDismissRequest = { /* Handle dismiss request */ },
@@ -113,7 +113,7 @@ fun EntryScreen(modifier: Modifier = Modifier, viewModel: EntryScreenViewModel= 
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Text(text = "Today's Total - ₹1000", fontSize = 19.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Today's Total - ₹${todayTotal}", fontSize = 19.sp, fontWeight = FontWeight.Bold)
                 EntryScreenOptions(onCancelClicked = onCancelClicked)
             }
 
@@ -332,7 +332,7 @@ fun ImageCardWithCancel(
 @Composable
 private fun EntryScreenPrev() {
     PocketPalTheme {
-        EntryScreen(onCancelClicked = {})
+        EntryScreen(todayTotal = 100,onCancelClicked = {})
 //        ErrorDialog("dada") { }
     }
 }

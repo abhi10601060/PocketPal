@@ -30,6 +30,7 @@ class EntryScreenViewModel @Inject constructor(val upsertExpenseUseCase: UpsertU
     var selectedLabel by mutableStateOf<Label?>(null)
     var images = mutableStateListOf<Bitmap>()
 
+
     var entryScreenState by mutableStateOf(EntryScreenState())
 
 

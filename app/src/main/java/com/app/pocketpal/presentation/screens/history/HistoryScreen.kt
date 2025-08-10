@@ -85,7 +85,7 @@ fun HistoryScreen(
     }
 
     if (showEntryDialog){
-        EntryScreen(onCancelClicked = {showEntryDialog = false})
+        EntryScreen(todayTotal = viewModel.todayAmount ,onCancelClicked = {showEntryDialog = false})
     }
 }
 
